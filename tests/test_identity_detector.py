@@ -48,3 +48,11 @@ def test_privacy_projection_does_not_expose_source_user_id():
     projected = alert.to_privacy_dict("test-salt")
     assert projected["user_id"] != alert.user_id
     assert len(projected["user_id"]) == 16
+
+
+def test_custom_severity_thresholds_are_validated_and_applied():
+    with pytest.raises(ValueError, match="thresholds"):
+        IdentityCompromiseDetector(severity_thresholds=(0.8, 0.7))
+    detector = IdentityCompromiseDetector(severity_thresholds=(0.2, 0.95)).fit(_events())
+    alert = detector.score(0, _events()[0])
+    assert alert.severity in {"low", "medium", "high"}
