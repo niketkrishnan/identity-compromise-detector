@@ -54,7 +54,12 @@ class IdentityAlert:
 
 
 class IdentityCompromiseDetector:
-    def __init__(self, contamination: float = 0.2, random_state: int = 42) -> None:
+    def __init__(self, contamination: float = 0.2, random_state: int = 42, severity_thresholds: tuple[float, float] = (0.4, 0.7)) -> None:
+        medium_threshold, high_threshold = severity_thresholds
+        if not 0.0 < medium_threshold < high_threshold <= 1.0:
+            raise ValueError("severity thresholds must satisfy 0 < medium < high <= 1")
+        self.medium_threshold = medium_threshold
+        self.high_threshold = high_threshold
         self.scaler = StandardScaler()
         self.model = IsolationForest(
             contamination=contamination,
@@ -119,7 +124,7 @@ class IdentityCompromiseDetector:
         anomaly = float(np.clip((raw - 0.25) / 0.9, 0.0, 1.0))
         rule_score = min(0.15 * len(reasons), 1.0)
         total = round(float(np.clip(0.55 * rule_score + 0.45 * anomaly, 0.0, 1.0)), 4)
-        severity = "high" if total >= 0.7 else "medium" if total >= 0.4 else "low"
+        severity = "high" if total >= self.high_threshold else "medium" if total >= self.medium_threshold else "low"
         return IdentityAlert(index, event.user_id, total, severity, tuple(dict.fromkeys(reasons)))
 
     def detect(self, events: list[LoginEvent]) -> list[IdentityAlert]:
