@@ -145,3 +145,12 @@ def summarize_alerts(alerts: list[IdentityAlert]) -> dict[str, Any]:
         for reason in alert.reasons:
             reason_counts[reason] = reason_counts.get(reason, 0) + 1
     return {"alert_count": len(alerts), "severity_counts": severity_counts, "reason_counts": reason_counts}
+
+
+def privacy_safe_report(alerts: list[IdentityAlert], salt: str = "local-demo") -> dict[str, Any]:
+    """Return aggregate evidence plus pseudonymous alert records for analysts."""
+    return {
+        "summary": summarize_alerts(alerts),
+        "alerts": [alert.to_privacy_dict(salt) for alert in alerts],
+        "privacy": {"user_identifier": "salted-sha256-prefix", "raw_identifiers_included": False},
+    }
