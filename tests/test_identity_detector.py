@@ -1,3 +1,5 @@
+import pytest
+
 from identity_detector import IdentityCompromiseDetector, LoginEvent
 
 
@@ -31,3 +33,18 @@ def test_detector_returns_one_alert_per_event():
     alerts = IdentityCompromiseDetector().detect(events)
     assert len(alerts) == len(events)
     assert all(alert.user_id == "u1" for alert in alerts)
+
+
+def test_login_event_rejects_invalid_identity_fields():
+    with pytest.raises(ValueError, match="hour"):
+        LoginEvent("2026-01-01T00:00:00Z", "u1", "d1", 64500, "US", 24, True)
+    with pytest.raises(ValueError, match="asn"):
+        LoginEvent("2026-01-01T00:00:00Z", "u1", "d1", 0, "US", 12, True)
+
+
+def test_privacy_projection_does_not_expose_source_user_id():
+    detector = IdentityCompromiseDetector().fit(_events())
+    alert = detector.score(0, _events()[0])
+    projected = alert.to_privacy_dict("test-salt")
+    assert projected["user_id"] != alert.user_id
+    assert len(projected["user_id"]) == 16
