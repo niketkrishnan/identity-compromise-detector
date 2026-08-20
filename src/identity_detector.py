@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any
 
+import hashlib
+
 import numpy as np
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
@@ -20,6 +22,14 @@ class LoginEvent:
     hour: int
     success: bool
     privilege: str = "user"
+
+    def __post_init__(self) -> None:
+        if not self.user_id or not self.device_id or not self.country:
+            raise ValueError("user_id, device_id, and country are required")
+        if self.asn <= 0:
+            raise ValueError("asn must be positive")
+        if not 0 <= self.hour <= 23:
+            raise ValueError("hour must be between 0 and 23")
 
 
 @dataclass(frozen=True)
