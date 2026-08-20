@@ -135,3 +135,13 @@ class IdentityCompromiseDetector:
         baseline_size = max(4, int(len(events) * 0.6))
         self.fit(events[:baseline_size])
         return [self.score(i, event) for i, event in enumerate(events)]
+
+
+def summarize_alerts(alerts: list[IdentityAlert]) -> dict[str, Any]:
+    """Return aggregate alert counts without returning raw identities."""
+    severity_counts = {level: sum(alert.severity == level for alert in alerts) for level in ("high", "medium", "low")}
+    reason_counts: dict[str, int] = {}
+    for alert in alerts:
+        for reason in alert.reasons:
+            reason_counts[reason] = reason_counts.get(reason, 0) + 1
+    return {"alert_count": len(alerts), "severity_counts": severity_counts, "reason_counts": reason_counts}
