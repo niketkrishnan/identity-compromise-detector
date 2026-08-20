@@ -1,0 +1,10 @@
+[
+  {"timestamp":"2026-01-01T09:00:00Z","user_id":"u-alice","device_id":"d-a","asn":64500,"country":"IN","hour":9,"success":true,"privilege":"user"},
+  {"timestamp":"2026-01-02T09:10:00Z","user_id":"u-alice","device_id":"d-a","asn":64500,"country":"IN","hour":9,"success":true,"privilege":"user"},
+  {"timestamp":"2026-01-03T09:05:00Z","user_id":"u-alice","device_id":"d-a","asn":64500,"country":"IN","hour":9,"success":true,"privilege":"user"},
+  {"timestamp":"2026-01-01T10:00:00Z","user_id":"u-bob","device_id":"d-b","asn":64501,"country":"US","hour":10,"success":true,"privilege":"user"},
+  {"timestamp":"2026-01-02T10:02:00Z","user_id":"u-bob","device_id":"d-b","asn":64501,"country":"US","hour":10,"success":true,"privilege":"user"},
+  {"timestamp":"2026-01-03T03:15:00Z","user_id":"u-bob","device_id":"d-unknown","asn":64599,"country":"RU","hour":3,"success":false,"privilege":"admin"},
+  {"timestamp":"2026-01-03T03:16:00Z","user_id":"u-bob","device_id":"d-unknown","asn":64599,"country":"RU","hour":3,"success":true,"privilege":"admin"},
+  {"timestamp":"2026-01-04T11:00:00Z","user_id":"u-carol","device_id":"d-c","asn":64502,"country":"GB","hour":11,"success":true,"privilege":"user"}
+]
