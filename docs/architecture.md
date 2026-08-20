@@ -1,11 +1,13 @@
-# Architecture
+# Behavioral analytics flow
 
-```text
-local identity events with synthetic identifiers and a future licensed public-authentication benchmark -> normalized input -> security analysis -> explainable result
-                                                |
-                                         tests and evaluation
+```mermaid
+flowchart LR
+    A[Identity events] --> B[Normalize fields]
+    B --> C[Behavioral signals]
+    B --> D[Isolation Forest]
+    C --> E[Reasoned alert]
+    D --> E
+    E --> F[Privacy-safe report]
 ```
 
-The repository keeps the core analysis logic independent from the command-line
-evaluation entry point. This supports deterministic unit tests and makes it
-possible to add an API or dashboard without changing the security boundary.
+The report projection intentionally leaves raw identifiers out of analyst-facing exports and does not perform account actions.
