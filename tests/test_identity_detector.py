@@ -1,6 +1,6 @@
 import pytest
 
-from identity_detector import IdentityCompromiseDetector, LoginEvent, summarize_alerts
+from identity_detector import IdentityCompromiseDetector, LoginEvent, privacy_safe_report, summarize_alerts
 
 
 def event(index: int, **overrides) -> LoginEvent:
@@ -16,6 +16,10 @@ def event(index: int, **overrides) -> LoginEvent:
     }
     base.update(overrides)
     return LoginEvent(**base)
+
+
+def _events() -> list[LoginEvent]:
+    return [event(1), event(2), event(3), event(4)]
 
 
 def test_detector_explains_new_device_and_country():
@@ -65,3 +69,12 @@ def test_alert_summary_aggregates_reasons_without_user_ids():
     assert summary["alert_count"] == len(alerts)
     assert "severity_counts" in summary
     assert "user_id" not in summary
+
+
+def test_privacy_safe_report_contains_aggregate_evidence_without_raw_ids():
+    detector = IdentityCompromiseDetector().fit(_events())
+    alerts = [detector.score(index, item) for index, item in enumerate(_events())]
+    report = privacy_safe_report(alerts, "report-salt")
+    assert report["summary"]["alert_count"] == len(alerts)
+    assert report["privacy"]["raw_identifiers_included"] is False
+    assert all(item["user_id"] != "u1" for item in report["alerts"])
