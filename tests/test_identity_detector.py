@@ -1,6 +1,6 @@
 import pytest
 
-from identity_detector import IdentityCompromiseDetector, LoginEvent
+from identity_detector import IdentityCompromiseDetector, LoginEvent, summarize_alerts
 
 
 def event(index: int, **overrides) -> LoginEvent:
@@ -40,3 +40,28 @@ def test_login_event_rejects_invalid_identity_fields():
         LoginEvent("2026-01-01T00:00:00Z", "u1", "d1", 64500, "US", 24, True)
     with pytest.raises(ValueError, match="asn"):
         LoginEvent("2026-01-01T00:00:00Z", "u1", "d1", 0, "US", 12, True)
+
+
+def test_privacy_projection_does_not_expose_source_user_id():
+    detector = IdentityCompromiseDetector().fit(_events())
+    alert = detector.score(0, _events()[0])
+    projected = alert.to_privacy_dict("test-salt")
+    assert projected["user_id"] != alert.user_id
+    assert len(projected["user_id"]) == 16
+
+
+def test_custom_severity_thresholds_are_validated_and_applied():
+    with pytest.raises(ValueError, match="thresholds"):
+        IdentityCompromiseDetector(severity_thresholds=(0.8, 0.7))
+    detector = IdentityCompromiseDetector(severity_thresholds=(0.2, 0.95)).fit(_events())
+    alert = detector.score(0, _events()[0])
+    assert alert.severity in {"low", "medium", "high"}
+
+
+def test_alert_summary_aggregates_reasons_without_user_ids():
+    detector = IdentityCompromiseDetector().fit(_events())
+    alerts = [detector.score(index, event) for index, event in enumerate(_events())]
+    summary = summarize_alerts(alerts)
+    assert summary["alert_count"] == len(alerts)
+    assert "severity_counts" in summary
+    assert "user_id" not in summary
