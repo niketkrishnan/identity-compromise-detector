@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "identity-compromise-detector"
+version = "0.1.0"
+description = "A privacy-conscious identity anomaly detector with explainable risk signals"
+requires-python = ">=3.11"
+dependencies = ["scikit-learn>=1.4", "numpy>=1.24", "fastapi>=0.110"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
