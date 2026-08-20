@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Defensive Security Evaluation Report",
+  "type": "object",
+  "required": ["data_note"],
+  "properties": {
+    "data_note": {"type": "string"},
+    "metrics": {"type": "object"},
+    "findings": {"type": "array"},
+    "alerts": {"type": "array"}
+  },
+  "additionalProperties": true
+}
