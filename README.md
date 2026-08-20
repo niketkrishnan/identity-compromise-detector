@@ -21,3 +21,7 @@ The starter fixture contains no personal information. A production-quality evalu
 ## Evaluation roadmap
 
 The next milestone is to evaluate on a verified public authentication dataset such as the LANL authentication dataset or another licensed academic benchmark. If an approved dataset cannot be obtained, the project must remain explicit about fixture-only results and must not claim production performance.
+
+## Development milestones
+
+The repository history is organized into incremental documentation, implementation, testing, evaluation, and release milestones.
