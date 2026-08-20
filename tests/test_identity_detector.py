@@ -1,6 +1,6 @@
 import pytest
 
-from identity_detector import IdentityCompromiseDetector, LoginEvent
+from identity_detector import IdentityCompromiseDetector, LoginEvent, summarize_alerts
 
 
 def event(index: int, **overrides) -> LoginEvent:
@@ -16,6 +16,10 @@ def event(index: int, **overrides) -> LoginEvent:
     }
     base.update(overrides)
     return LoginEvent(**base)
+
+
+def _events() -> list[LoginEvent]:
+    return [event(1), event(2), event(3), event(4)]
 
 
 def test_detector_explains_new_device_and_country():
@@ -56,3 +60,12 @@ def test_custom_severity_thresholds_are_validated_and_applied():
     detector = IdentityCompromiseDetector(severity_thresholds=(0.2, 0.95)).fit(_events())
     alert = detector.score(0, _events()[0])
     assert alert.severity in {"low", "medium", "high"}
+
+
+def test_alert_summary_aggregates_reasons_without_user_ids():
+    detector = IdentityCompromiseDetector().fit(_events())
+    alerts = [detector.score(index, event) for index, event in enumerate(_events())]
+    summary = summarize_alerts(alerts)
+    assert summary["alert_count"] == len(alerts)
+    assert "severity_counts" in summary
+    assert "user_id" not in summary
