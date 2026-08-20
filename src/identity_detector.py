@@ -45,6 +45,13 @@ class IdentityAlert:
         result["reasons"] = list(self.reasons)
         return result
 
+    def to_privacy_dict(self, salt: str = "local-demo") -> dict[str, Any]:
+        """Return an analyst projection without exposing the source user identifier."""
+        result = self.to_dict()
+        digest = hashlib.sha256(f"{salt}:{self.user_id}".encode("utf-8")).hexdigest()
+        result["user_id"] = digest[:16]
+        return result
+
 
 class IdentityCompromiseDetector:
     def __init__(self, contamination: float = 0.2, random_state: int = 42) -> None:
